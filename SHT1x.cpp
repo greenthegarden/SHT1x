@@ -35,14 +35,16 @@ float SHT1x::readTemperatureC()
   float _temperature;      // Temperature derived from raw value
 
   // Conversion coefficients from SHT15 datasheet
-  const float D1 = -40.0;  // for 14 Bit @ 5V
-  const float D2 =   0.01; // for 14 Bit DEGC
+  // https://www.sparkfun.com/datasheets/Sensors/SHT1x_datasheet.pdf
+  // Table 9
+  const float D1_ = -39.7;   // for 14 Bit @ 3.5V
+  const float D2_ =   0.01;  // for 14 Bit DEGC
 
   // Fetch raw value
   _val = readTemperatureRaw();
 
   // Convert raw value to degrees Celsius
-  _temperature = (_val * D2) + D1;
+  _temperature = (_val * D2_) + D1_;
 
   return (_temperature);
 }
@@ -56,14 +58,14 @@ float SHT1x::readTemperatureF()
   float _temperature;       // Temperature derived from raw value
 
   // Conversion coefficients from SHT15 datasheet
-  const float D1 = -40.0;   // for 14 Bit @ 5V
-  const float D2 =   0.018; // for 14 Bit DEGF
+  const float D1_ = -40.0;   // for 14 Bit @ 5V
+  const float D2_ =   0.018; // for 14 Bit DEGF
 
   // Fetch raw value
   _val = readTemperatureRaw();
 
   // Convert raw value to degrees Fahrenheit
-  _temperature = (_val * D2) + D1;
+  _temperature = (_val * D2_) + D1_;
 
   return (_temperature);
 }
@@ -78,7 +80,9 @@ float SHT1x::readHumidity()
   float _correctedHumidity;    // Temperature-corrected humidity
   float _temperature;          // Raw temperature value
 
-  // Conversion coefficients from SHT15 datasheet
+  // Conversion coefficients from SHT10 datasheet
+  // https://www.sparkfun.com/datasheets/Sensors/SHT1x_datasheet.pdf
+  // Table 6
   const float C1 = -4.0;       // for 12 Bit
   const float C2 =  0.0405;    // for 12 Bit
   const float C3 = -0.0000028; // for 12 Bit
@@ -136,10 +140,10 @@ int SHT1x::shiftIn(int _dataPin, int _clockPin, int _numBits)
 
   for (i=0; i<_numBits; ++i)
   {
-     digitalWrite(_clockPin, HIGH);
-     delay(10);  // I don't know why I need this, but without it I don't get my 8 lsb of temp
-     ret = ret*2 + digitalRead(_dataPin);
-     digitalWrite(_clockPin, LOW);
+    digitalWrite(_clockPin, HIGH);
+    delay(10);  // I don't know why I need this, but without it I don't get my 8 lsb of temp
+    ret = ret*2 + digitalRead(_dataPin);
+    digitalWrite(_clockPin, LOW);
   }
 
   return(ret);
